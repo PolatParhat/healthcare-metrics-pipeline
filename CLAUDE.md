@@ -159,3 +159,15 @@ Credentials: `app.py` reads `st.secrets["aws"]` when present (how the deployed a
 Git: this folder was not a git repo before this session. Initialized `git init`, branch renamed to `main`, `.gitignore` (already present) correctly excludes `cohesive-bonbon-509303-d5-10e52d8a3b3c.json` (a GCP service-account key unrelated to this AWS project) and `dashboard/.streamlit/secrets.toml` - verified neither is tracked after the initial commit. Initial commit made: all project files as of 2026-09-26 (Step4_Implementation, aws/, dashboard/, CLAUDE.md, docs). GitHub remote and push are left to the user (external-service auth, not done by the assistant) - see chat for the copy-paste `gh`/`git remote` commands and Streamlit Community Cloud deployment steps.
 
 **Next step:** user pushes to GitHub and connects the repo on Streamlit Community Cloud (steps given in chat, not repeated here since they involve account-specific choices). Once deployed, update this file with the live app URL.
+
+## Dashboard testing + bug fixes (2026-09-26)
+
+Added `dashboard/tests/test_app_smoke.py` - runs the real `app.py` via `streamlit.testing.v1.AppTest` against synthetic Gold data (`boto3.Session` is mocked with a fake S3 client serving synthetic Parquet bytes, so the real partition-discovery/pagination code in `app.py` is actually exercised, not bypassed). 5 tests, all passing: default render of all 5 tabs, a facility-search interaction, a compare-states metric switch, a state-deep-dive state switch, and a hand-calculation check that `facility_level_staffing_readmission()`'s days-reported-weighted average matches manual arithmetic.
+
+**Real bug found and fixed by this testing, not guessed:** `get_boto3_session()`'s `"aws" in st.secrets` raised an exception (rather than returning `False`) when no `secrets.toml` file exists anywhere Streamlit looks - which is exactly the supported local-dev case `dashboard/README.md` documents (run against an existing `aws configure` profile, no secrets file needed). Without a try/except around that check, the app crashed in its own documented supported use case. Fixed by wrapping it in `try/except Exception` and falling through to the default credential chain on any failure.
+
+**Unrelated bug also found and fixed while checking `git status` before committing:** `.gitignore`'s `"Data/Claude outputs/"` entry was wrapped in quotes, which gitignore treats as literal characters (not a way to escape spaces) - it never actually matched the real, unquoted folder name, so that folder sat untracked-but-visible in `git status` instead of being ignored. Fixed by removing the quotes; verified with `git check-ignore -v` before and after.
+
+Also added `dashboard/requirements-dev.txt` (adds `pytest` on top of `requirements.txt`) and added `.pytest_cache/` to `.gitignore`.
+
+Dashboard code + tests are committed (`git log` up to date). Still outside what this assistant does: pushing to GitHub and connecting/deploying on Streamlit Community Cloud - both need the user's own account auth, steps given in chat.
