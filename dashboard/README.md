@@ -17,6 +17,21 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+## Tests
+
+`tests/test_app_smoke.py` runs the real app against synthetic data (no AWS
+credentials needed) using Streamlit's own `AppTest` framework - it patches
+`boto3.Session` with a fake S3 client serving synthetic Parquet, so the real
+partition-discovery/pagination code in `app.py` still runs, just against
+fake bytes instead of the real bucket. It checks that all 5 tabs render
+without an unhandled exception, and hand-verifies the days-reported-weighted
+average used for the metric-5 correlation against a manual calculation.
+
+```bash
+pip install -r requirements-dev.txt
+pytest tests/ -v
+```
+
 ## Deploy on Streamlit Community Cloud
 
 1. Push this repo to GitHub (see the project root for git setup).

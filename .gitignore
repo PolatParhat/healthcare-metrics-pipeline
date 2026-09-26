@@ -5,7 +5,7 @@ Data/supportingFiles/
 
 # EDA/teaching image outputs - regenerate via 02_initial_eda.py
 eda_output/
-"Data/Claude outputs/"
+Data/Claude outputs/
 
 # Streamlit secrets - never commit real credentials/config
 dashboard/.streamlit/secrets.toml
@@ -15,4 +15,5 @@ dashboard/.streamlit/secrets.toml
 .vscode/
 __pycache__/
 *.pyc
+.pytest_cache/
 cohesive-bonbon-509303-d5-10e52d8a3b3c.json

@@ -100,8 +100,20 @@ def get_boto3_session() -> boto3.Session:
     Cloud gets AWS access - entered by the project owner into Streamlit's own
     secrets UI, never typed into this code). Falls back to boto3's default
     credential chain for local development against an existing AWS CLI
-    profile."""
-    if "aws" in st.secrets:
+    profile.
+
+    st.secrets raises (rather than just returning False from `in`) when no
+    secrets.toml file exists at all anywhere Streamlit looks for one - which
+    is exactly the supported local-dev case documented in README.md (run
+    against an `aws configure` profile, no secrets file needed). Without this
+    try/except, that supported case crashes the app instead of falling
+    through to the default credential chain."""
+    try:
+        has_aws_secrets = "aws" in st.secrets
+    except Exception:
+        has_aws_secrets = False
+
+    if has_aws_secrets:
         return boto3.Session(
             aws_access_key_id=st.secrets["aws"]["aws_access_key_id"],
             aws_secret_access_key=st.secrets["aws"]["aws_secret_access_key"],
@@ -326,7 +338,7 @@ def main():
     # ------------------------------------------------------------------
     with tab_state:
         states = sorted(state_summary["provider_state"].dropna().unique())
-        chosen_state = st.selectbox("Choose a state", states)
+        chosen_state = st.selectbox("Choose a state", states, key="state_deep_dive_state")
 
         state_rows = state_summary[state_summary["provider_state"] == chosen_state].sort_values("year_month")
 
@@ -366,7 +378,9 @@ def main():
         )
         states = sorted(state_summary["provider_state"].dropna().unique())
         default_states = states[:2] if len(states) >= 2 else states
-        chosen_states = st.multiselect("States to compare", states, default=default_states, max_selections=3)
+        chosen_states = st.multiselect(
+            "States to compare", states, default=default_states, max_selections=3, key="compare_states_multiselect"
+        )
 
         metric_choice_label = st.selectbox("Metric", list(METRIC_LABELS.values()), key="compare_metric")
         metric_choice = next(k for k, v in METRIC_LABELS.items() if v == metric_choice_label)
@@ -456,7 +470,9 @@ def main():
     # Tab 5 - Facility Explorer
     # ------------------------------------------------------------------
     with tab_facility:
-        search = st.text_input("Search by facility name or CMS Certification Number (CCN/PROVNUM)")
+        search = st.text_input(
+            "Search by facility name or CMS Certification Number (CCN/PROVNUM)", key="facility_search_input"
+        )
 
         if search:
             mask = facility_metrics["provider_name"].str.contains(search, case=False, na=False) | facility_metrics[
@@ -476,7 +492,7 @@ def main():
         if options.empty:
             st.info("No facilities match that search.")
         else:
-            chosen_label = st.selectbox("Facility", options["label"])
+            chosen_label = st.selectbox("Facility", options["label"], key="facility_select")
             chosen_provnum = options.loc[options["label"] == chosen_label, "PROVNUM"].iloc[0]
 
             facility_rows = facility_metrics[facility_metrics["PROVNUM"] == chosen_provnum].sort_values("year_month")
