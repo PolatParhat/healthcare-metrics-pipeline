@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowEventBridgePublish",
+            "Effect": "Allow",
+            "Principal": { "Service": "events.amazonaws.com" },
+            "Action": "SNS:Publish",
+            "Resource": "arn:aws:sns:us-west-1:941377112484:HealthcareMetricsAlerts",
+            "Condition": {
+                "ArnEquals": { "aws:SourceArn": "arn:aws:events:us-west-1:941377112484:rule/HealthcareMetrics*" }
+            }
+        }
+    ]
+}

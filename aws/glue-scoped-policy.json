@@ -1,0 +1,39 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetJob", "glue:StartJobRun", "glue:GetJobRun", "glue:GetJobRuns", "glue:BatchStopJobRun",
+                "glue:GetCrawler", "glue:StartCrawler", "glue:StopCrawler",
+                "glue:GetWorkflow", "glue:GetWorkflowRun", "glue:StartWorkflowRun", "glue:GetWorkflowRunProperties"
+            ],
+            "Resource": [
+                "arn:aws:glue:us-west-1:941377112484:job/HealthcareMetrics*",
+                "arn:aws:glue:us-west-1:941377112484:crawler/HealthcareMetrics*",
+                "arn:aws:glue:us-west-1:941377112484:workflow/HealthcareMetrics*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "glue:GetDatabase", "glue:CreateDatabase", "glue:GetTable", "glue:GetTables",
+                "glue:CreateTable", "glue:UpdateTable", "glue:DeleteTable",
+                "glue:GetPartition", "glue:GetPartitions", "glue:CreatePartition", "glue:BatchCreatePartition",
+                "glue:UpdatePartition", "glue:DeletePartition", "glue:BatchDeletePartition", "glue:BatchGetPartition"
+            ],
+            "Resource": [
+                "arn:aws:glue:us-west-1:941377112484:catalog",
+                "arn:aws:glue:us-west-1:941377112484:database/healthcare_metrics*",
+                "arn:aws:glue:us-west-1:941377112484:table/healthcare_metrics*/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:us-west-1:941377112484:log-group:/aws-glue/*"
+        }
+    ]
+}

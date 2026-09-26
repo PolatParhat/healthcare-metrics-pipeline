@@ -1,0 +1,7 @@
+{
+    "source": ["aws.glue"],
+    "detail-type": ["Glue Job State Change", "Glue Crawler State Change", "Glue Workflow State Change"],
+    "detail": {
+        "state": ["FAILED", "TIMEOUT", "ERROR"]
+    }
+}
