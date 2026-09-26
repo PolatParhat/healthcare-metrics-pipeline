@@ -145,3 +145,17 @@ Immediate next step (as of this file's last update): the manual test chain is do
 - Theorized a wrong root cause (backlog from failed runs) for an unexpected 10-file re-ingestion during ingestion testing, before the real cause (Google Drive permission-propagation lag on a newly-shared folder) was confirmed.
 
 General lesson driving all of these: **check the real file/doc/bucket before asserting anything specific about this project's data or design - don't reason from filenames, memory of an earlier message, or general domain knowledge alone.**
+
+## Step 5 - Streamlit dashboard (2026-09-26)
+
+Data access: direct S3 Parquet read via boto3 (no Athena) - chosen over Athena to keep the stack simpler and avoid a second AWS service for a portfolio-scale dataset. Deployment target: Streamlit Community Cloud, connected to this GitHub repo.
+
+Built `dashboard/app.py` (+ `requirements.txt`, `README.md`, `.streamlit/secrets.toml.example`), covering all 5 locked metrics across 5 tabs: National Overview (KPI tiles + state choropleth + national trend), State Deep Dive, Compare States (max 3, per the dataviz palette's all-pairs validation limit), Staffing vs. Readmission, and Facility Explorer. Uses the validated `dataviz` skill palette (categorical blue/orange/aqua, sequential blue ramp for the choropleth, shared chart theme) rather than default Plotly colors.
+
+**Resolved the open facility-month-vs-facility-grain design decision (flagged above, under "Manual test chain"):** the dashboard's correlation tab collapses `facility_metrics` to one row per facility (`facility_level_staffing_readmission()` in `app.py`) before computing the correlation, weighting each facility's average HPRD by `num_days_reported` per month. Reasoning: `readmission_score` is a fixed per-facility value (`F.first(...)` in `aggregate_gold.py`), so using the raw facility-month table would let a facility that reported 12 months count 12x as heavily as one that reported 1 month, purely from reporting completeness - not from anything about its actual staffing or outcomes. One row per facility gives every facility equal weight, which is the statistically defensible choice.
+
+Credentials: `app.py` reads `st.secrets["aws"]` when present (how the deployed app on Streamlit Community Cloud gets access - entered directly into Streamlit's own secrets UI) and falls back to boto3's default credential chain for local runs against an existing `aws configure` profile. No credentials are hardcoded or requested by the assistant.
+
+Git: this folder was not a git repo before this session. Initialized `git init`, branch renamed to `main`, `.gitignore` (already present) correctly excludes `cohesive-bonbon-509303-d5-10e52d8a3b3c.json` (a GCP service-account key unrelated to this AWS project) and `dashboard/.streamlit/secrets.toml` - verified neither is tracked after the initial commit. Initial commit made: all project files as of 2026-09-26 (Step4_Implementation, aws/, dashboard/, CLAUDE.md, docs). GitHub remote and push are left to the user (external-service auth, not done by the assistant) - see chat for the copy-paste `gh`/`git remote` commands and Streamlit Community Cloud deployment steps.
+
+**Next step:** user pushes to GitHub and connects the repo on Streamlit Community Cloud (steps given in chat, not repeated here since they involve account-specific choices). Once deployed, update this file with the live app URL.
