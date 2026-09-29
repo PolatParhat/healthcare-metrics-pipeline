@@ -99,7 +99,6 @@ def get_drive_service(secret_name, region):
     secrets_client = boto3.client("secretsmanager", region_name=region)
     secret_value = secrets_client.get_secret_value(SecretId=secret_name)
     service_account_info = json.loads(secret_value["SecretString"])
-
     credentials = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=DRIVE_SCOPES
     )

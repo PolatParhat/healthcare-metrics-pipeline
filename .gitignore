@@ -3,8 +3,8 @@
 Data/PBJ_Daily_Nurse_Staffing_Q2_2024.csv
 Data/supportingFiles/
 
-# EDA/teaching image outputs - regenerate via 02_initial_eda.py
-eda_output/
+# EDA output images - regenerate via eda/02_initial_eda.py
+eda/eda_output/
 Data/Claude outputs/
 
 # Streamlit secrets - never commit real credentials/config
@@ -16,4 +16,14 @@ dashboard/.streamlit/secrets.toml
 __pycache__/
 *.pyc
 .pytest_cache/
-cohesive-bonbon-509303-d5-10e52d8a3b3c.json
+
+# AI-session scaffolding / one-off teaching material - not part of the app
+CLAUDE.md
+PIPELINE_BUILD_GUIDE.md
+streamlit_101.py
+
+# Google Cloud service-account keys - these download with an opaque
+# project-hash filename (not a predictable "*credentials*" pattern), so if
+# you ever re-download one, name it service-account-key.json and it'll be
+# caught here. Never commit real credentials regardless of filename.
+service-account-key.json

@@ -8,7 +8,7 @@ import pandas as pd
 
 MASTER = "Data/PBJ_Daily_Nurse_Staffing_Q2_2024.csv"
 ENCODING = "cp1252"
-OUT_DIR = Path("eda_output")
+OUT_DIR = Path(__file__).resolve().parent / "eda_output"
 OUT_DIR.mkdir(exist_ok=True)
 
 HOURS_COLS = ["Hrs_RNDON", "Hrs_RNadmin", "Hrs_RN", "Hrs_LPNadmin",
