@@ -1,0 +1,17 @@
+# Copy this file to terraform.tfvars (git-ignored) and fill in your real values.
+
+region = "us-west-1"
+
+# The long ID in your shared Google Drive folder's URL, after /folders/
+drive_folder_id = "REPLACE_WITH_YOUR_DRIVE_FOLDER_ID"
+
+# Where job-failure / pipeline-finished SNS emails go. AWS will send a
+# confirmation link to this address right after `terraform apply` - click it
+# or you'll never actually receive alerts.
+alert_email = "you@example.com"
+
+# Local path to the folder holding ingest_pbj_data.py,
+# HealthcareMetricsValidateBronze.py, HealthcareMetricsTransformSilver.py,
+# HealthcareMetricsGoldETL.py. terraform/ sits at the repo root next to
+# aws/, so this is it:
+glue_scripts_dir = "../../../aws/scripts"
